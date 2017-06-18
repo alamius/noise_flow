@@ -4,7 +4,7 @@ function Grid(h, w, nse_str) {
   for (x = 0; x < w; x += 1) {
     this.G[x] = [];
     for (y = 0; y < h; y += 1) {
-      this.G[x][y] = new Noise_vector(x, y, nse_str); //remind to global sett
+      this.G[x][y] = new Spot(x, y, nse_str); //remind to global sett
     }
   }
   //executing the update function every Spot inherits and thus just a distributor

@@ -1,4 +1,4 @@
-function Noise_vector(x, y, nse_str) {
+function Spot(x, y, nse_str) {
   //keeping one "spot" of the grid and thus one static point, that has a noisely orbiting dot
   this.pos = createVector(x, y);
   this.pss = createVector(x * diff.x, y * diff.y); //making as many Points as nessessary (according w * h)
