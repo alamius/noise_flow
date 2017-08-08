@@ -1,91 +1,117 @@
 <html>
 <head>
-  <meta charset="UTF-8">
-  <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
-  <!-- uncomment lines below to include extra p5 libraries -->
-  <script language="javascript" src="libraries/p5.dom.js"></script>
-  <!--<script language="javascript" src="libraries/p5.sound.js"></script>-->
-  <script language="javascript" type="text/javascript" src="sketch.js"></script>
-  <script language="javascript" type="text/javascript" src="Grid.js"></script>
-  <script language="javascript" type="text/javascript" src="Spot.js"></script>
-  <script language="javascript" type="text/javascript" src="Particle.js"></script>
-  <!-- this line removes any default padding and style. you might only need one of these values set. -->
-  <style>
-  body {
-    padding: 0;
-    margin: 0;
-  }
-  div.border {
-    position: absolute;
-    width: 400px;
-    height: 100px;
-    border: 3px solid #73AD21;
-    bottom: 20px;
-  }
-  #divR {
-    width: auto;
-    height: auto;
-    left: 20px;
-    bottom: 200px;
-  }
-  #div0, #div0_0      {    left: 20px;  }
-  #div0_1             {    left: 220px;  }
-  #div1, #div1_0      {    left: 420px;  }
-  #div1_1             {    left: 620px;  }
-  #div2, #div2_0      {    left: 820px;  }
-  #div2_1             {    left: 1020px;  }
-  #div3, #div3_0      {    left: 1220px;  }
-  #div2_1             {    left: 1420px;  }
-  p {
-    margin: 5px 10px;
-  }
-  #RES {
-    width: 150px;
-  }
-  </style>
-  <!-- style="position: absolute; bottom: 80px; left: 0; width: 300px; height: 100px; border: 3px solid #73AD21;" -->
+    <title> Colorful Noise Flow v2017.08.08 </title>
+    <meta charset="UTF-8">
+    <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
+    <script language="javascript" src="libraries/p5.dom.js"></script>
+    <!--<script language="javascript" src="libraries/p5.sound.js"></script>-->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/p5.min.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/addons/p5.dom.min.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/addons/p5.sound.min.js"></script> -->
+    <script language="javascript" type="text/javascript" src="sketch.js"></script>
+    <script language="javascript" type="text/javascript" src="prld.js"></script>
+    <script language="javascript" type="text/javascript" src="Grid.js"></script>
+    <script language="javascript" type="text/javascript" src="Spot.js"></script>
+    <script language="javascript" type="text/javascript" src="Particle.js"></script>
+    <script language="javascript" type="text/javascript" src="utils.js"></script>
+    <style>
+    body {
+        padding: 0;
+        margin: 0;
+    }
+    div {
+        background-color: #ffffff;
+    }
+    div.border {
+        position: absolute;
+        width: 400px;
+        height: 180px;
+        border: 3px solid #73AD21;
+        bottom: 20px;
+    }
+    div.thin_border {
+        position: absolute;
+        width: 165px;
+        height: 150px;
+        border-color: #73AD21;
+        bottom: 15px;
+    }
+    #divR {
+        width: 400px;
+        height: auto;
+        left: 20px;
+        bottom: 220px;
+    }
+    #div0, #div0_0      {    left: 20px;  }
+    #div0_1             {    left: 220px;  }
+    #div1, #div1_0      {    left: 420px;  }
+    #div1_1             {    left: 220px;  }
+    #div2, #div2_0      {    left: 820px;  }
+    #div2_1             {    left: 1020px;  }
+    #div3, #div3_0      {    left: 1220px;  }
+    #div2_1             {    left: 1420px;  }
+    p {
+        margin: 5px 10px;
+    }
+    input {
+        margin: 3px 10px;
+        width: 150;
+    }
+    #BUTT {
+        width: 150px;
+    }
+    </style>
+    <!-- style="position: absolute; bottom: 80px; left: 0; width: 300px; height: 100px; border: 3px solid #73AD21;" -->
 </head>
 
 <body>
-  <div id="divR" class="border">
-    <button onclick="prep()" id="RES">RESTART</button>
-  </div>
-  <div id="div0" class="border">
-    <div id="div0_0">
-      <p id="p_a"></p>    <!-- particle_amount -->
-      <p id="powr"></p>    <!-- power -->
-      <p id="slw"></p>    <!-- slowdown -->
-      <p id="mpn"></p>    <!-- mapping_number -->
+    <div id="divR" class="border">
+        <span style="padding: 5px"> <button onclick="prep()" id="BUTT">RESTART</button> the same as pressing "R" <splan/> <br />
+        <span style="padding: 5px"> <button onclick="loopToggle()" id="BUTT">TOGGLE LOOP</button> the same as pressing "L" <splan/>
     </div>
-    <div id="div0_1">
-      <input type="range" min="0.1" max="10" step="0.01" id="slider_power" />
-      <input type="range" min="0.0" max="5" step="0.01" id="slider_slwdn" />
-      <input type="range" min="-3.14" max="3.14" step="0.01" id="slider_mapnm" />
+    <div id="div0" class="border">
+        <div id="div0_0">
+            <p id="p_a"></p>    <!-- particle_amount -->
+            <p id="powr"></p>    <!-- spot_vector_power -->
+            <p id="slw"></p>    <!-- particle_speed_factor -->
+            <p id="mpn"></p>    <!-- spot_angle_mapping -->
+        </div>
+        <div id="div0_1" class="thin_border">
+            <input type="number" min="1"      max="20000" step="1"    id="input_prtcl" onchange="particle_amount        = input_prtcl.valueAsNumber; /*prep();*/ "/>
+            <input type="number" min="0.1"    max="2"     step="0.01" id="input_power" onchange="spot_vector_power      = input_power.valueAsNumber;"/>
+            <input type="number" min="0.0"    max="1.2"   step="0.01" id="input_sfctr" onchange="particle_speed_factor  = input_sfctr.valueAsNumber;"/>
+            <input type="number" min="-3.14"  max="3.14"  step="0.01" id="input_mapnm" onchange="spot_angle_mapping     = input_mapnm.valueAsNumber;"/>
+        </div>
     </div>
-  </div>
-  <div id="div1" class="border">
-    <div id="div1_0">
-      <p id="h"></p>      <!-- h -->
-      <p id="w"></p>      <!-- w -->
+    <div id="div1" class="border">
+        <div id="div1_0">
+            <p id="h"></p>      <!-- h -->
+            <p id="w"></p>      <!-- w -->
+            <p id="str_x"></p>  <!-- stretch.x = nse_str.x -->
+            <p id="str_y"></p>  <!-- stretch.y = nse_str.y -->
+        </div>
+        <div id="div1_1" class="thin_border">
+            <input type="number" min="5"      max="2000"  step="1"    id="input_h"     onchange="h                      = input_h    .valueAsNumber; /*prep();*/ "/>
+            <input type="number" min="5"      max="2000"  step="1"    id="input_w"     onchange="w                      = input_w    .valueAsNumber; /*prep();*/ "/>
+            <input type="number" min="0.0001" max="100"   step="0.0001"id="input_nse_x"onchange="nse_str.x              = input_nse_x.valueAsNumber;"/>
+            <input type="number" min="0.0001" max="100"   step="0.0001"id="input_nse_y"onchange="nse_str.y              = input_nse_y.valueAsNumber;"/>
+        </div>
     </div>
-    <div id="div1_1">
+    <div id="div2" class="border">
+        <div id="div2_0">
+            <p id="incr"></p>   <!-- c_incr -->
+            <p id="p_s"></p>    <!-- particle_show_size -->
+            <p id="c"></p>      <!-- c -->
+        </div>
+        <div id="div2_1">
+        </div>
     </div>
-  <div id="div2" class="border">
-    <div id="div2_0">
-      <p id="incr"></p>   <!-- c_incr -->
-      <p id="p_s"></p>    <!-- point_size -->
-    </div>
-    <div id="div2_1">
-    </div>
-  </div>
-  <div id="div3" class="border">
-    <div id="div3_0">
-      <p id="str_x"></p>  <!-- stretch.x = nse_str.x -->
-      <p id="str_y"></p>  <!-- stretch.y = nse_str.y -->
-      <p id="c"></p>      <!-- c -->
-    </div>
-    <div id="div3_1">
-    </div>
-  </div>
+    <!-- <div id="div3" class="border"> -->
+    <!-- <div id="div3">
+        <div id="div3_0">
+        </div>
+        <div id="div3_1">
+        </div>
+    </div> -->
 </body>
 </html>
