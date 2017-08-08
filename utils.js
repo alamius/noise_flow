@@ -27,9 +27,36 @@ Array.prototype.apply_to_all = function(applying, returning = false){
 Array.prototype.to_string = function(sep){
     result = '';
     for(i = 0; i < this.length; i++){
-        result += str(this[i]) + sep;
+        result += this[i].toString() || str(this[i]) + sep;
     }
     return result;
+}
+
+Array.prototype.all_vectors_in_dist = function(pos, dist, dist_mode){
+    dist_mode = dist_mode || 'radius';
+    all_vectors = [];
+    //getting the range where Spots might still be in distance
+    min_i = floor(pos.x - dist);
+    max_i =  ceil(pos.x + dist);
+    min_j = floor(pos.y - dist);
+    max_j =  ceil(pos.y + dist);
+    min_i = (min_i <  0 ? 0   : min_i);
+    max_i = (max_i >= w ? w-1 : max_i);
+    min_j = (min_j <  0 ? 0   : min_j);
+    max_j = (max_j >= h ? h-1 : max_j);
+    for(i = min_i; i <= max_i; i++){
+        for(j = min_j; j <= max_j; j++){
+            if(dist_mode == 'radius'){
+                measure = pos.copy_sub(i, j).mag();
+                if(measure <= dist){
+                    all_vectors.push(this[i][j]);
+                }
+            }else if(dist_mode == 'dist'){
+                all_vectors.push(this[i][j]);
+            }
+        }
+    }
+    return all_vectors;
 }
 
 String.prototype.contains = function(obj){
@@ -47,26 +74,12 @@ p5.Vector.prototype.copy_sub = function (x, y, z) {
     if (x instanceof p5.Vector) {    V.x -= x.x || 0;       V.y -= x.y || 0;        V.z -= x.z || 0;        return V;    }
     if (x instanceof Array) {        V.x -= x[0] || 0;      V.y -= x[1] || 0;       V.z -= x[2] || 0;       return V;    }
                                      V.x -= x || 0;         V.y -= y || 0;          V.z -= z || 0;          return V;
-};
-
+}
 p5.Vector.prototype.copy_add = function (x, y, z) {
     V = createVector(this.x, this.y, this.z);
     if (x instanceof p5.Vector) {       V.x += x.x || 0;         V.y += x.y || 0;        V.z += x.z || 0;        return V;    }
     if (x instanceof Array) {           V.x += x[0] || 0;        V.y += x[1] || 0;       V.z += x[2] || 0;       return V;    }
                                         V.x += x || 0;           V.y += y || 0;          V.z += z || 0;          return V;
-};
-
-function arguments_to_arr(arg){
-    result = new Array();
-    ai = 0;
-    while(arg[ai]){
-        result[ai] = arg[ai];
-        ai++;
-    }
-    return result;
-}
-function ata(arg){
-    return arguments_to_arr(arg);
 }
 
 function not(arr){ return !(or(arr)); }
@@ -135,7 +148,7 @@ function col_to_str(col){
     col.r = round_(col.r, 3) || 0;
     col.g = round_(col.g, 3) || 0;
     col.b = round_(col.b, 3) || 0;
-    col.a = round_(col.a, 3) || 0;
+    col.a = round_(col.a, 3) || 255;
     cs = ''
     if(col.r == col.g && col.g == col.b){
         cs += str(col.r);
@@ -152,7 +165,34 @@ function col_to_str(col){
     );
     return cs;
 }
+function color_copy(s, t, u, v){
+    r = 0;
+    g = 0;
+    b = 0;
+    a = 255;
+    if(s instanceof Array){
+        if(s.length == 1){            r = s[0];    g = s[0];    b = s[0];            }else
+        if(s.length == 2){            r = s[0];    g = s[0];    b = s[0];  l = s[1]; }else
+        if(s.length == 3){            r = s[0];    g = s[1];    b = s[2];            }else
+        if(s.length == 4){            r = s[0];    g = s[1];    b = s[2];  l = s[3]; }
+    }else{
+        if(arguments.length == 1){    r = s;       g = s;       b = s;            }else
+        if(arguments.length == 2){    r = s;       g = s;       b = s;     l = t; }else
+        if(arguments.length == 3){    r = s;       g = t;       b = u;            }else
+        if(arguments.length == 4){    r = s;       g = t;       b = u;     l = v; }
+    }
+    return {r:r, g:g, b:b, a:a};
+}
+function color_to_arr(col){
+    r = col.r || 0;
+    g = col.g || 0;
+    b = col.b || 0;
+    a = col.a || 255;
 
+    return [r, g, b, a];
+}
+
+//giving the index of the smallest element in array
 function min_index(array){
     minimum = Infinity;
     minim_i = -1;

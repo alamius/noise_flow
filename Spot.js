@@ -1,8 +1,7 @@
 function Spot(x, y, nse_str) {
     //keeping one "spot" of the grid and thus one static point, that has a noisely orbiting dot
     this.pos = createVector(x, y);
-    this.pss = createVector(x * diff.x, y * diff.y); //making as many Points as nessessary (according w * h)
-    //call of this.update() is done (but in another line, after its declaration)
+    this.pss = createVector(x * diff.x, y * diff.y);
     this.dot; //the position of the end of the vector (absolute)
     this.dir; //the position of the end of the vector (realtive)
     this.edge = -1;
@@ -25,22 +24,22 @@ function Spot(x, y, nse_str) {
     // d = 0;
     // this.edge_tilt.x = map(direction_center.x, a, 0, b, d);
     // this.edge_tilt.y = map(direction_center.y, a, 0, b, d);
-    this.const_angle = false;
+    this.const_angle = false; //telling whether the angle of this might change over time or stays constant
 
 
+    //call of this.update() is done (but in another line, after its declaration)
     this.update = function(){
         this.len = spot_vector_power;
         //length of a spots line according to the absolute position (x, y, (c as a timekeeper)) times the settings for stretching x and y so the noise is getting projected onto the coordinates bigger or smaller
         // this.len = noise(
-        //   this.pss.x * sett.nse_str.x,
-        //   this.pss.y * sett.nse_str.y,
+        //   this.pss.x * nse_str.x,
+        //   this.pss.y * nse_str.y,
         //   c
-        // ) * power;
-        //the length gets ajusted by power
+        // ) * spot_vector_power;
+        //the length gets ajusted by spot_vector_power
         //for the angle, it works the same (coordinates and projection) except that it uses another part of the noise field
         //  (100 ahead from the lengths (meaning that every noise(x,y,c) used by the lengths will be used by the angles later, but thats not a problem))
         if(!this.const_angle){
-
             // this.ang = map(
             //   noise(
             //     this.pss.x * nse_str.x + this.edge_tilt.x,
@@ -53,8 +52,8 @@ function Spot(x, y, nse_str) {
             if(
                 grid_simple_repelling_edge &&
                 this.edge >= 0 &&
-                sre_edges[this.edge])
-            {
+                sre_edges[this.edge]
+            ){
                 this.ang = HALF_PI * this.edge;
                 this.len = sre_power;
             }else{
@@ -95,7 +94,6 @@ function Spot(x, y, nse_str) {
     }
 
     this.show = function() {
-        //if the settings "sett" tell to use lines; using the line/stroke color from the colorsettings "clrs" and the positions of begin and end of the line (from this.pss to this.dot)
         stroke(spot_vector_stroke);
         stretched_dot = createVector(
             this.pss.x + cos(this.ang) * this.len * spot_vector_stretch,

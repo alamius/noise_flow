@@ -1,19 +1,19 @@
 <html>
 <head>
+    <title> Colorful Noise Flow v2017.08.08 </title>
     <meta charset="UTF-8">
     <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
     <script language="javascript" src="libraries/p5.dom.js"></script>
     <!--<script language="javascript" src="libraries/p5.sound.js"></script>-->
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/p5.min.js"></script>-->
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/addons/p5.dom.min.js"></script>-->
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/addons/p5.sound.min.js"></script>-->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/p5.min.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/addons/p5.dom.min.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/addons/p5.sound.min.js"></script> -->
     <script language="javascript" type="text/javascript" src="sketch.js"></script>
     <script language="javascript" type="text/javascript" src="prld.js"></script>
     <script language="javascript" type="text/javascript" src="Grid.js"></script>
     <script language="javascript" type="text/javascript" src="Spot.js"></script>
     <script language="javascript" type="text/javascript" src="Particle.js"></script>
     <script language="javascript" type="text/javascript" src="utils.js"></script>
-    <!-- this line removes any default padding and style. you might only need one of these values set. -->
     <style>
     body {
         padding: 0;
@@ -66,8 +66,7 @@
 
 <body>
     <div id="divR" class="border">
-        <span style="padding: 5px"> <button onclick="prep()" id="BUTT">RESTART</button> the same as pressing "R" <splan/>
-        <br />
+        <span style="padding: 5px"> <button onclick="prep()" id="BUTT">RESTART</button> the same as pressing "R" <splan/> <br />
         <span style="padding: 5px"> <button onclick="loopToggle()" id="BUTT">TOGGLE LOOP</button> the same as pressing "L" <splan/>
     </div>
     <div id="div0" class="border">
@@ -78,10 +77,10 @@
             <p id="mpn"></p>    <!-- spot_angle_mapping -->
         </div>
         <div id="div0_1" class="thin_border">
-            <input type="number" min="1"      max="20000" step="1"    id="input_prtcl" onchange="update_prtcl()"/>
-            <input type="number" min="0.1"    max="2"     step="0.01" id="input_power" onchange="update_power()"/>
-            <input type="number" min="0.0"    max="1.2"   step="0.01" id="input_sfctr" onchange="update_sfctr()"/>
-            <input type="number" min="-3.14"  max="3.14"  step="0.01" id="input_mapnm" onchange="update_mapnm()"/>
+            <input type="number" min="1"      max="20000" step="1"    id="input_prtcl" onchange="particle_amount        = input_prtcl.valueAsNumber; /*prep();*/ "/>
+            <input type="number" min="0.1"    max="2"     step="0.01" id="input_power" onchange="spot_vector_power      = input_power.valueAsNumber;"/>
+            <input type="number" min="0.0"    max="1.2"   step="0.01" id="input_sfctr" onchange="particle_speed_factor  = input_sfctr.valueAsNumber;"/>
+            <input type="number" min="-3.14"  max="3.14"  step="0.01" id="input_mapnm" onchange="spot_angle_mapping     = input_mapnm.valueAsNumber;"/>
         </div>
     </div>
     <div id="div1" class="border">
@@ -92,10 +91,10 @@
             <p id="str_y"></p>  <!-- stretch.y = nse_str.y -->
         </div>
         <div id="div1_1" class="thin_border">
-            <input type="number" min="5"      max="2000"  step="1"    id="input_h"     onchange="update_h()"/>
-            <input type="number" min="5"      max="2000"  step="1"    id="input_w"     onchange="update_w()"/>
-            <input type="number" min="0.0001" max="100"   step="0.0001"id="input_nse_x"onchange="update_nse_x()"/>
-            <input type="number" min="0.0001" max="100"   step="0.0001"id="input_nse_y"onchange="update_nse_y()"/>
+            <input type="number" min="5"      max="2000"  step="1"    id="input_h"     onchange="h                      = input_h    .valueAsNumber; /*prep();*/ "/>
+            <input type="number" min="5"      max="2000"  step="1"    id="input_w"     onchange="w                      = input_w    .valueAsNumber; /*prep();*/ "/>
+            <input type="number" min="0.0001" max="100"   step="0.0001"id="input_nse_x"onchange="nse_str.x              = input_nse_x.valueAsNumber;"/>
+            <input type="number" min="0.0001" max="100"   step="0.0001"id="input_nse_y"onchange="nse_str.y              = input_nse_y.valueAsNumber;"/>
         </div>
     </div>
     <div id="div2" class="border">
@@ -108,11 +107,11 @@
         </div>
     </div>
     <!-- <div id="div3" class="border"> -->
-    <div id="div3">
+    <!-- <div id="div3">
         <div id="div3_0">
         </div>
         <div id="div3_1">
         </div>
-    </div>
+    </div> -->
 </body>
 </html>

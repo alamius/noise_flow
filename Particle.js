@@ -10,28 +10,28 @@ function Particle(x, y, i) {
     this.prev_size = createVector();
 
     this.update = function() {
-        if(!this.delete){
-            if(particle_death_dist && frameCount > 10 || particle_death_percent){
-                this.check_death();
-                if(this.delete){return 0;}
-            }
-            this.acc = this.get_acc();
-            this.pos.add(this.vel);
-            // this.vel.add(this.acc);
-            this.vel = this.acc;
-            this.vel.mult(particle_speed_factor);
+        if(this.delete){ return 0; }
 
-            if(particle_age_increase && !this.age_const){
-                this.age++;
-                if(this.age >= particle_age_max){
-                    if(particle_age_death){
-                        this.delete = true;
-                    }else
-                    if(particle_dead_color_reset){
-                        this.age = 0;
-                    }else{
-                        this.age_const = true;
-                    }
+        if(particle_death_dist || particle_death_percent){
+            this.check_death();
+            if(this.delete){return 0;}
+        }
+        this.acc = this.get_acc();
+        this.pos.add(this.vel);
+        this.vel.add(this.acc);
+        // this.vel = this.acc;
+        this.vel.mult(particle_speed_factor);
+
+        if(particle_age_increase && !this.age_const){
+            this.age++;
+            if(this.age >= particle_age_max){
+                if(particle_age_death){
+                    this.delete = true;
+                }else
+                if(particle_dead_color_reset){
+                    this.age = 0;
+                }else{
+                    this.age_const = true;
                 }
             }
         }
@@ -41,33 +41,18 @@ function Particle(x, y, i) {
         if (particle_show && !this.delete && this.vel.mag() > particle_show_only_moving) {
             // img_col = img.get(this.pos.x * diff.x / 3, this.pos.y * diff.y / 3);
             // fill(img_col[0], img_col[1], img_col[2], img_col[3]);
-            strk = {
-                r: particle_show_color_strk.r || 0,
-                g: particle_show_color_strk.g || 0,
-                b: particle_show_color_strk.b || 0,
-                a: particle_show_color_strk.a || 255
-            }
-            fllc = {
-                r: particle_show_color_fill.r || 0,
-                g: particle_show_color_fill.g || 0,
-                b: particle_show_color_fill.b || 0,
-                a: particle_show_color_fill.a || 255
-            }
-            foca = {
-                r: particle_show_color_fill_const_ang.r || 0,
-                g: particle_show_color_fill_const_ang.g || 0,
-                b: particle_show_color_fill_const_ang.b || 0,
-                a: particle_show_color_fill_const_ang.a || 255
-            }
+            strk = color_copy(color_to_arr(particle_show_color_strk))
+            fllc = color_copy(color_to_arr(particle_show_color_fill));
+            foca = color_copy(color_to_arr(particle_show_color_fill_const_ang));
             neg_oca = particle_show_color_ngtv_const_ang; //whether the particles over a onstant angle Spot shall be negatively colored
-            oca = this.over_const_angle; //whether the current particle is over aconstant angle; see this.update
+            oca = this.over_const_angle; //whether the current particle is over a constant angle; see this.get_acc
             neg_ac = particle_age_color_negation; //whether all age-depending color shall be negated
             neg_st = particle_age_color_anti_stroke; //whether the stroke shall be negated
             neg_fl = particle_age_color_anti_fill; //whether the fill shall be negated
 
             //color according to the age of this particle shall be gray
             if(particle_age_color_gray){
-                if(xor([and([neg_oca, oca]), neg_ac])){
+                if(xor([neg_oca && oca, neg_ac])){
                     c = (1 - this.age / particle_age_max) * 255;
                 }else{
                     c =      this.age / particle_age_max  * 255;
@@ -76,7 +61,8 @@ function Particle(x, y, i) {
                 if(neg_fl){   fllca = (255 - c);   }else{     fllca = (c);   }
                 stroke(strka);
                 fill(fllca);
-                color_mode = 'color: stroke: ' + str(strka) + '; fill: ' + str(fllca);
+                //debug
+                // color_mode = 'color: stroke: ' + str(strka) + '; fill: ' + str(fllca);
             }else
             //color according to the age of this particle shall be like particle_show_color_fill and *_strk tell
             if(particle_age_color_base_colors){
@@ -91,16 +77,20 @@ function Particle(x, y, i) {
                 if(xor([neg_fl, neg_ac])){ fllca = negate_color(fllca);}
                 stroke(strka.r, strka.g, strka.b, strka.a);
                 fill(fllca.r, fllca.g, fllca.b, fllca.a);
-                color_mode = 'color: stroke: ' + col_to_str(strka) + '; fill: ' + col_to_str(fllca);
+                //debug
+                // color_mode = 'color: stroke: ' + col_to_str(strka) + '; fill: ' + col_to_str(fllca);
+            //do not color according to particle age
             }else{
-                color_mode = 'else';
+                //debug
+                // color_mode = 'else';
                 stroke(strk.r, strk.g, strk.b, strk.a);
-                //color_negative in a non-grey context means that the foca is used
-                if(neg_oca && oca){   fill(foca.r, foca.g, foca.b, foca.a);
-                }else{                fill(fllc.r, fllc.g, fllc.b, fllc.a);
+                //color_negative over a constant angle in a non-grey context means that the foca is used
+                if(neg_oca && oca){   fllca = foca;
+                }else{                fllca = fllc;
                 }
-                fllca = fllc;
+                fill(fllca.r, fllca.g, fllca.b, fllca.a);
             }
+
             x1 = this.pos.x * diff.x;
             y1 = this.pos.y * diff.y;
             r1 = particle_show_size;
@@ -138,38 +128,26 @@ function Particle(x, y, i) {
     }
 
     this.get_acc = function() {
-        if(!this.delete){
-            px = floor(this.pos.x);
-            py = floor(this.pos.y);
-            // console.log(px, py);
-            this.over_const_angle = grid.G[px][py].const_angle;
-            dir = grid.G[px][py].dir;
-            if(this.over_const_angle){
-                // console.log('get_acc: x:', px, ', y:', py, '; dir:', round_(dir.x, 3), ', ', round_(dir.y, 3));
-            }
-            return createVector(dir.x, dir.y); //making a copy so the dir of that Spot doesn't get linked but copied
-        }
-        return 0;
+        if(this.delete){ return 0; }
+
+        px = floor(this.pos.x);
+        py = floor(this.pos.y);
+        this.over_const_angle = grid.G[px][py].const_angle;
+        dir                   = grid.G[px][py].dir;
+        return createVector(dir.x, dir.y); //making a copy so the dir of that Spot doesn't get linked but copied
     }
 
     this.flow_on = function() {
         x = this.pos.x;
         y = this.pos.y;
-        if(!(x < 0 || x > w || y < 0 || y > h)){
-            return 0;
-        }
-        // if(particle_death_edge){
-        //     this.delete = true;
-        //     // console.log('edge-death: pos == (' + str(round_(x,3)) + ', ' + str(round_(y,3)) + ')');
-        //     return 0;
-        // }
+        if(!(x < 0 || x > w || y < 0 || y > h)){ return 0; }
 
         if(flow_on_redistribute == 'random'){
-            while(x < 0 || x >= (w-1)){     x = random(0, w);            }
-            while(y < 0 || y >= (h-1)){     y = random(0, h);            }
+            while(x < 0 || x > w){     x = random(0, w);            }
+            while(y < 0 || y > h){     y = random(0, h);            }
         }else
         if(flow_on_redistribute == 'noise'){
-            while(x < 0 || x >= (w) || y < 0 || y >= (h)){
+            while(x < 0 || x >= w || y < 0 || y >= h){
                 if(flow_on_redistribute_noise == 'random'){
                     x = map(noise(random(0, 10)), 0, 1, 0, w);
                     y = map(noise(random(0, 10)), 0, 1, 0, h);
@@ -183,24 +161,26 @@ function Particle(x, y, i) {
             this.delete = true;
             return 0;
         }else{
-            if(x < 0)       {           x = (w) + x % (w);      }else
-            if(x >= (w-1))  {           x = /*0; //*/x % (w);       }
-            if(y < 0)       {           y = (h) + y % (h);      }else
-            if(y >= (h-1))  {           y = /*0; //*/y % (h);     }
+            if(x < 0)       {           x = w + x % w;      }else
+            if(x >= (w-1))  {           x = x % w;       }
+            if(y < 0)       {           y = h + y % h;      }else
+            if(y >= (h-1))  {           y = y % h;     }
         }
 
+        //debug
         // fill(220, 64);  noStroke();   ellipse(x * diff.x, y * diff.y, 20);
         // console.log('x, y:', x, y);
 
         //velocity update
         if(flow_on_stop_after){           this.vel = createVector();
         }else if(flow_on_set_new_vel){    this.vel = grid.G[floor(x)][floor(y)].dir; }
+
         this.pos.x = x;
         this.pos.y = y;
     }
 
     this.check_death = function(){
-        if(this.delete){return 0; }
+        if(this.delete){ return 0; }
         if(particle_death_dist){
             for(i = this.i; i < P.length; i++){
                 P_pos = P[i].pos;
